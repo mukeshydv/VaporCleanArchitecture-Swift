@@ -9,8 +9,8 @@ import Foundation
 import FluentSQLite
 import Domain
 
-struct Product: SQLiteStringModel {
-    var id: String?
+struct Product: SQLiteModel {
+    var id: Int?
     var description: String
     var price: Float64
     var createdAt: Date

@@ -10,7 +10,7 @@ import Foundation
 public enum DomainError: LocalizedError {
     case validationError(String)
     case notFoundError(String)
-    case somethingWrong
+    case somethingWrong(String)
     
     public var errorDescription: String? {
         switch self {
@@ -18,8 +18,8 @@ public enum DomainError: LocalizedError {
             return error
         case .notFoundError(let error):
             return error
-        case .somethingWrong:
-            return "Something went wrong"
+        case .somethingWrong(let error):
+            return error
         }
     }
 }

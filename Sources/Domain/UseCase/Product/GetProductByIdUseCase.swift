@@ -15,13 +15,13 @@ public struct GetProductByIdUseCase: AnyUseCase {
         self.repository = repository
     }
     
-    public func execute(request: String) -> Future<Product> {
+    public func execute(request: Int) -> Future<Product> {
         return repository.getProductById(request)
     }
 }
 
 extension GetProductByIdUseCase {
-    public static func create(_ repository: ProductRepository) -> UseCase<String, Product> {
+    public static func create(_ repository: ProductRepository) -> UseCase<Int, Product> {
         return UseCase(GetProductByIdUseCase(repository))
     }
 }

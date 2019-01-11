@@ -17,7 +17,7 @@ public struct ProductRepository: Domain.ProductRepository {
         conn = connection
     }
     
-    public func getProductById(_ id: String) -> Future<Domain.Product> {
+    public func getProductById(_ id: Int) -> Future<Domain.Product> {
         return conn.newConnection(to: .sqlite).flatMap {
             Product.find(id, on: $0)
                 .unwrap(or: DomainError.notFoundError("Product with id: \(id) is not found."))

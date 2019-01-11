@@ -25,7 +25,11 @@ struct Provider: ProductProvider, ServiceType {
         conn = connection
     }
     
-    func createProductUseCase() -> UseCase<String, Product> {
+    func findProductUseCase() -> UseCase<Int, Product> {
         return GetProductByIdUseCase.create(ProductRepository(conn))
+    }
+    
+    func saveProductUseCase() -> UseCase<Product, Void> {
+        return CreateProductUseCase.create(ProductRepository(conn))
     }
 }

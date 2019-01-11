@@ -20,3 +20,9 @@ public struct CreateProductUseCase: AnyUseCase {
         return repository.save(product: request)
     }
 }
+
+extension CreateProductUseCase {
+    public static func create(_ repository: ProductRepository) -> UseCase<Product, Void> {
+        return UseCase(CreateProductUseCase(repository))
+    }
+}
