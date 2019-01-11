@@ -6,18 +6,22 @@
 //
 
 import Foundation
-public struct GetProductByIdUseCase: UseCase {
+
+public struct GetProductByIdUseCase: AnyUseCase {
+    
     private let repository: ProductRepository
     
     init(_ repository: ProductRepository) {
         self.repository = repository
     }
     
-    public func execute(request: String) throws -> Product {
-        if let product = repository.getProductById(request) {
-            return product
-        }
-        
-        throw DomainError.notFoundError("Product with id: \(request) not found")
+    public func execute(request: String) -> Future<Product> {
+        return repository.getProductById(request)
+    }
+}
+
+extension GetProductByIdUseCase {
+    public static func create(_ repository: ProductRepository) -> UseCase<String, Product> {
+        return UseCase(GetProductByIdUseCase(repository))
     }
 }

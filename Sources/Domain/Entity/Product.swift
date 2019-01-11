@@ -8,8 +8,15 @@
 import Foundation
 
 public struct Product {
-    let code: String
-    let description: String
-    let price: Float80
-    let createdAt: Date
+    public let code: String?
+    public let description: String
+    public let price: Float80
+    public let createdAt: Date
+    
+    public init(code: String?, description: String, price: Float80, createdAt: Date) {
+        self.code = code
+        self.description = description
+        self.price = price
+        self.createdAt = createdAt
+    }
 }

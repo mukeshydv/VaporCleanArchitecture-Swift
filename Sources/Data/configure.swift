@@ -6,13 +6,12 @@
 //
 
 import Foundation
+import Fluent
 import FluentSQLite
 
-public func databaseProvider() -> FluentSQLiteProvider {
-    return FluentSQLiteProvider()
-}
-
-public func databaseConfig() throws -> DatabasesConfig {
+public func configure(_ services: inout Services) throws {
+    /// Register providers first
+    try services.register(FluentSQLiteProvider())
     
     // Configure a database
     let database = try SQLiteDatabase(storage: .memory)
@@ -21,12 +20,11 @@ public func databaseConfig() throws -> DatabasesConfig {
     var databases = DatabasesConfig()
     databases.add(database: database, as: .sqlite)
     
-    return databases
-}
-
-public func migrationConfig() -> MigrationConfig {
-    var migrations = MigrationConfig()
-//    migrations.add(model: Todo.self, database: .sqlite)
+    services.register(databases)
     
-    return migrations
+    /// Configure migrations
+    var migrations = MigrationConfig()
+    migrations.addMigrations()
+    
+    services.register(migrations)
 }

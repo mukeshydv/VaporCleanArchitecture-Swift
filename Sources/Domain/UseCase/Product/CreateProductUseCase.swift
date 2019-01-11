@@ -7,16 +7,16 @@
 
 import Foundation
 
-public struct CreateProductUseCase: UseCase {
+public struct CreateProductUseCase: AnyUseCase {
     private let repository: ProductRepository
     
     init(_ repository: ProductRepository) {
         self.repository = repository
     }
     
-    public func execute(request: Product) throws -> Void {
+    public func execute(request: Product) throws -> Future<Void> {
         guard request.price > 0 else { throw DomainError.validationError("Price must not be negative") }
         
-        repository.save(product: request)
+        return repository.save(product: request)
     }
 }

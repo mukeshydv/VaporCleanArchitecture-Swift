@@ -8,6 +8,6 @@
 import Foundation
 
 public protocol ProductRepository {
-    func getProductById(_ id: String) -> Product?
-    func save(product: Product)
+    func getProductById(_ id: String) -> Future<Product>
+    func save(product: Product) -> Future<Void>
 }
