@@ -6,10 +6,10 @@
 //
 
 import Foundation
-import FluentSQLite
 import Domain
+import Fluent
 
-struct Product: SQLiteModel {
+struct Product: DBModel {
     var id: Int?
     var description: String
     var price: Float64

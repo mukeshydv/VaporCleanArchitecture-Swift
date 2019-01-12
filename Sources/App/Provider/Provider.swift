@@ -10,18 +10,11 @@ import Vapor
 import Domain
 import Data
 
-struct Provider: ProductProvider, ServiceType {
-    static var serviceSupports: [Any.Type] {
-        return [ProductProvider.self]
-    }
+struct Provider: ProductProvider {
     
-    static func makeService(for worker: Container) throws -> Provider {
-        return Provider(worker)
-    }
+    private let conn: DatabaseConnectable
     
-    private let conn: Container
-    
-    init(_ connection: Container) {
+    init(_ connection: DatabaseConnectable) {
         conn = connection
     }
     

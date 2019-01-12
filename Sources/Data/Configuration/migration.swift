@@ -10,6 +10,6 @@ import Fluent
 
 extension MigrationConfig {
     mutating func addMigrations() {
-        add(model: Product.self, database: .sqlite)
+        add(model: Product.self, database: .psql)
     }
 }

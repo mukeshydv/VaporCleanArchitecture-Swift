@@ -7,27 +7,23 @@
 
 import Foundation
 import Domain
-import FluentSQLite
+import Fluent
 
 public struct ProductRepository: Domain.ProductRepository {
     
-    private let conn: Container
+    private let conn: DatabaseConnectable
     
-    public init(_ connection: Container) {
+    public init(_ connection: DatabaseConnectable) {
         conn = connection
     }
     
     public func getProductById(_ id: Int) -> Future<Domain.Product> {
-        return conn.newConnection(to: .sqlite).flatMap {
-            Product.find(id, on: $0)
-                .unwrap(or: DomainError.notFoundError("Product with id: \(id) is not found."))
-                .mapToDomain()
-        }
+        return Product.find(id, on: conn)
+            .unwrap(or: DomainError.notFoundError("Product with id: \(id) is not found."))
+            .mapToDomain()
     }
     
     public func save(product: Domain.Product) -> Future<Void> {
-        return conn.newConnection(to: .sqlite).flatMap {
-            return product.toData.save(on: $0).mapToVoid()
-        }
+        return product.toData.save(on: conn).mapToVoid()
     }
 }
