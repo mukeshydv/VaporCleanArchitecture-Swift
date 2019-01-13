@@ -8,6 +8,6 @@
 import Foundation
 
 public protocol ProductProvider {
-    func findProductUseCase() -> UseCase<Int, Product>
-    func saveProductUseCase() -> UseCase<Product, Void>
+    var findProductUseCase: UseCase<Int, Product> { get }
+    var saveProductUseCase: UseCase<Product, Void> { get }
 }

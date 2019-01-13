@@ -11,7 +11,7 @@ public struct GetProductByIdUseCase: AnyUseCase {
     
     private let repository: ProductRepository
     
-    init(_ repository: ProductRepository) {
+    private init(_ repository: ProductRepository) {
         self.repository = repository
     }
     

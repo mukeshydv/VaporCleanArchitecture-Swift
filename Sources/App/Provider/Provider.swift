@@ -11,18 +11,17 @@ import Domain
 import Data
 
 struct Provider: ProductProvider {
-    
     private let conn: DatabaseConnectable
     
     init(_ connection: DatabaseConnectable) {
         conn = connection
     }
     
-    func findProductUseCase() -> UseCase<Int, Product> {
+    var findProductUseCase: UseCase<Int, Product> {
         return GetProductByIdUseCase.create(ProductRepository(conn))
     }
     
-    func saveProductUseCase() -> UseCase<Product, Void> {
+    var saveProductUseCase: UseCase<Product, Void> {
         return CreateProductUseCase.create(ProductRepository(conn))
     }
 }

@@ -19,14 +19,14 @@ final class ProductController: RouteCollection {
 }
 
 extension ProductController {
-    func getProduct(_ request: Request) throws -> Future<BaseResponse<ProductDto>> {
+    private func getProduct(_ request: Request) throws -> Future<BaseResponse<ProductDto>> {
         let id = try request.parameters.next(Int.self)
-        return try request.make(ProductProvider.self).findProductUseCase().executeResponse(id)
+        return try request.make(ProductProvider.self).findProductUseCase.executeResponse(id)
     }
     
-    func addProduct(_ request: Request) throws -> Future<BaseResponse<Empty>> {
+    private func addProduct(_ request: Request) throws -> Future<BaseResponse<Empty>> {
         return try request.content.decode(ProductDto.self).flatMap {
-            return try request.make(ProductProvider.self).saveProductUseCase().executeResponse($0.toProduct)
+            return try request.make(ProductProvider.self).saveProductUseCase.executeResponse($0.toProduct)
         }
     }
 }

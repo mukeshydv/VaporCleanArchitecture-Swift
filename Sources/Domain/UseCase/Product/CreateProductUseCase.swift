@@ -10,7 +10,7 @@ import Foundation
 public struct CreateProductUseCase: AnyUseCase {
     private let repository: ProductRepository
     
-    init(_ repository: ProductRepository) {
+    private init(_ repository: ProductRepository) {
         self.repository = repository
     }
     

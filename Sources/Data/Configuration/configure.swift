@@ -19,6 +19,17 @@ public func configure(_ services: inout Services) throws {
     
     let files = FileManager.default
     
+//     Change this to your database configuration path. This file has config like this:
+//     Password is optional
+//
+//    {
+//        "hostname": "127.0.0.1",
+//        "username": "postgre",
+//        "database": "postgre",
+//        "password": null,
+//        "port": 5432
+//    }
+    
     #if os(Linux)
     let path = "/home/ubuntu/.db_configure.json"
     #else
@@ -29,7 +40,7 @@ public func configure(_ services: inout Services) throws {
         struct Connection: Decodable {
             let hostname: String
             let username: String
-            let password: String
+            let password: String?
             let port: Int
             let database: String
         }
@@ -40,13 +51,16 @@ public func configure(_ services: inout Services) throws {
             hostname: connection.hostname,
             port: connection.port,
             username: connection.username,
-            database: connection.database)
+            database: connection.database,
+            password: connection.password
+        )
         
         let database = PostgreSQLDatabase(config: config)
         
         /// Register the configured SQLite database to the database config.
         var databases = DatabasesConfig()
         databases.add(database: database, as: .psql)
+        databases.enableLogging(on: .psql)
         
         services.register(databases)
         
