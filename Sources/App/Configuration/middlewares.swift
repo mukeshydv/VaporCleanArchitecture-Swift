@@ -7,7 +7,6 @@
 
 import Foundation
 import Vapor
-import Domain
 
 extension MiddlewareConfig {
     mutating func addMiddlewares() {

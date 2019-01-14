@@ -6,11 +6,10 @@
 //
 
 import Foundation
-import Vapor
-import Domain
+import Service
 
-extension DatabaseConnectable {
-    func make(_ type: ProductProvider.Protocol) -> ProductProvider {
-        return Provider(self)
+extension Services {
+    mutating func registerProviders() {
+        register(Provider.self)
     }
 }

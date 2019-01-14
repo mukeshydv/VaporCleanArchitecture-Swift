@@ -11,17 +11,25 @@ import Domain
 import Data
 
 struct Provider: ProductProvider {
-    private let conn: DatabaseConnectable
+    private let repository: Domain.ProductRepository
     
-    init(_ connection: DatabaseConnectable) {
-        conn = connection
+    init(_ container: Container) throws {
+        self.repository = try container.make(ProductRepository.self)
     }
     
     var findProductUseCase: UseCase<Int, Product> {
-        return GetProductByIdUseCase.create(ProductRepository(conn))
+        return GetProductByIdUseCase.create(repository)
     }
     
     var saveProductUseCase: UseCase<Product, Void> {
-        return CreateProductUseCase.create(ProductRepository(conn))
+        return CreateProductUseCase.create(repository)
+    }
+}
+
+extension Provider: ServiceType {
+    public static var serviceSupports: [Any.Type] = [ProductProvider.self]
+    
+    static func makeService(for worker: Container) throws -> Provider {
+        return try .init(worker)
     }
 }

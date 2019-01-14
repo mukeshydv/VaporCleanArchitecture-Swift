@@ -57,7 +57,7 @@ public func configure(_ services: inout Services) throws {
         
         let database = PostgreSQLDatabase(config: config)
         
-        /// Register the configured SQLite database to the database config.
+        /// Register the configured PostgreSQL database to the database config.
         var databases = DatabasesConfig()
         databases.add(database: database, as: .psql)
         databases.enableLogging(on: .psql)
@@ -69,5 +69,17 @@ public func configure(_ services: inout Services) throws {
         migrations.addMigrations()
         
         services.register(migrations)
+    }
+    
+    services.registerRepositories()
+}
+
+extension Database {
+    public typealias ConnectionPool = DatabaseConnectionPool<ConfiguredDatabase<PostgreSQLDatabase>>
+}
+
+extension Container {
+    func connectionPool() throws -> DatabaseConnectionPool<ConfiguredDatabase<PostgreSQLDatabase>> {
+        return try connectionPool(to: .psql)
     }
 }

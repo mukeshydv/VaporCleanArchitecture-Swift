@@ -11,19 +11,31 @@ import Fluent
 
 public struct ProductRepository: Domain.ProductRepository {
     
-    private let conn: DatabaseConnectable
+    private let db: Database.ConnectionPool
     
-    public init(_ connection: DatabaseConnectable) {
-        conn = connection
+    public init(_ db: Database.ConnectionPool) {
+        self.db = db
     }
     
     public func getProductById(_ id: Int) -> Future<Domain.Product> {
-        return Product.find(id, on: conn)
-            .unwrap(or: DomainError.notFoundError("Product with id: \(id) is not found."))
-            .mapToDomain()
+        return db.withConnection {
+            return Product.find(id, on: $0)
+                .unwrap(or: DomainError.notFoundError("Product with id: \(id) is not found."))
+                .mapToDomain()
+        }
     }
     
     public func save(product: Domain.Product) -> Future<Void> {
-        return product.toData.save(on: conn).mapToVoid()
+        return db.withConnection {
+            return product.toData.save(on: $0).mapToVoid()
+        }
+    }
+}
+
+extension ProductRepository: ServiceType {
+    public static var serviceSupports: [Any.Type] = [Domain.ProductRepository.self]
+    
+    public static func makeService(for worker: Container) throws -> ProductRepository {
+        return .init(try worker.connectionPool())
     }
 }
