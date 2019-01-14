@@ -14,19 +14,23 @@ final class ProductController: RouteCollection {
         let group = router.grouped("product")
         
         group.get("/", Int.parameter, use: getProduct)
-        group.post("/", use: addProduct)
+        group.post(ProductRequest.self, at: "/", use: addProduct)
+    }
+    
+    private let provider: ProductProvider
+    
+    init(_ provider: ProductProvider) {
+        self.provider = provider
     }
 }
 
 extension ProductController {
-    private func getProduct(_ request: Request) throws -> Future<BaseResponse<ProductDto>> {
+    private func getProduct(_ request: Request) throws -> Future<BaseResponse<ProductRequest>> {
         let id = try request.parameters.next(Int.self)
-        return try request.make(ProductProvider.self).findProductUseCase.executeResponse(id)
+        return try provider.findProductUseCase.executeResponse(id)
     }
     
-    private func addProduct(_ request: Request) throws -> Future<BaseResponse<Empty>> {
-        return try request.content.decode(ProductDto.self).flatMap {
-            return try request.make(ProductProvider.self).saveProductUseCase.executeResponse($0.toProduct)
-        }
+    private func addProduct(_ request: Request, _ product: ProductRequest) throws -> Future<BaseResponse<Empty>> {
+        return try provider.saveProductUseCase.executeResponse(product.toProduct)
     }
 }

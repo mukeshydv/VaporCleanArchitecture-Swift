@@ -9,21 +9,21 @@ import Foundation
 import Vapor
 import Domain
 
-struct ProductDto: Content {
+struct ProductRequest: Content {
     public let code: Int?
     public let description: String
     public let price: Float
     public let createdAt: Date
 }
 
-extension ProductDto {
+extension ProductRequest {
     var toProduct: Product {
         return Product(code: code, description: description, price: Float80(price), createdAt: createdAt)
     }
 }
 
 extension Product: ResponseConvertible {
-    var toResponse: ProductDto {
-        return ProductDto(code: code, description: description, price: Float(price), createdAt: createdAt)
+    var toResponse: ProductRequest {
+        return ProductRequest(code: code, description: description, price: Float(price), createdAt: createdAt)
     }
 }

@@ -16,43 +16,17 @@ public func configure(_ services: inout Services) throws {
     try services.register(FluentPostgreSQLProvider())
     
     // Configure a database
-    
-    let files = FileManager.default
-    
-//     Change this to your database configuration path. This file has config like this:
-//     Password is optional
-//
-//    {
-//        "hostname": "127.0.0.1",
-//        "username": "postgre",
-//        "database": "postgre",
-//        "password": null,
-//        "port": 5432
-//    }
-    
-    #if os(Linux)
-    let path = "/home/ubuntu/.db_configure.json"
-    #else
-    let path = "/Users/mukesh/.db_configure.json"
-    #endif
-    
-    if let content = files.contents(atPath: path) {
-        struct Connection: Decodable {
-            let hostname: String
-            let username: String
-            let password: String?
-            let port: Int
-            let database: String
-        }
-        
-        let connection = try JSONDecoder().decode(Connection.self, from: content)
+    if let hostname = Environment.get("db_hostname"),
+        let username = Environment.get("db_username"),
+        let portString = Environment.get("db_port"),
+        let database = Environment.get("db_database"),
+        let port = Int(portString) {
         
         let config = PostgreSQLDatabaseConfig(
-            hostname: connection.hostname,
-            port: connection.port,
-            username: connection.username,
-            database: connection.database,
-            password: connection.password
+            hostname: hostname,
+            port: port,
+            username: username,
+            database: database
         )
         
         let database = PostgreSQLDatabase(config: config)
@@ -69,6 +43,8 @@ public func configure(_ services: inout Services) throws {
         migrations.addMigrations()
         
         services.register(migrations)
+    } else {
+        fatalError("Cannot connect to db")
     }
     
     services.registerRepositories()
