@@ -9,11 +9,19 @@ import Foundation
 import Vapor
 import Domain
 
-struct ErrorMiddleware: Middleware, Service {
-    func respond(to request: Request, chainingTo next: Responder) throws -> EventLoopFuture<Response> {
-        return try next.respond(to: request).catchFlatMap {
-            let error = $0 as? DomainError ?? DomainError.somethingWrong($0.localizedDescription)
-            return try error.toResponse.encode(for: request)
+struct ErrorMiddleware: Middleware {
+    func respond(to request: Request, chainingTo next: Responder) -> EventLoopFuture<Response> {
+        return next.respond(to: request).flatMapError {
+            let error: DomainError
+            switch $0 {
+            case let err as DomainError:
+                error = err
+            case let err as AbortError:
+                error = DomainError.validationError(err.reason)
+            default:
+                error = DomainError.somethingWrong($0.localizedDescription)
+            }
+            return error.toResponse.encodeResponse(status: error.status, for: request)
         }
     }
 }

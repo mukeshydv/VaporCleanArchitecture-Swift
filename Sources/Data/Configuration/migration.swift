@@ -6,10 +6,13 @@
 //
 
 import Foundation
-import Fluent
+import FluentKit
 
-extension MigrationConfig {
-    mutating func addMigrations() {
-        add(model: Product.self, database: .psql)
+extension Migrations {
+    func addMigrations() {
+        self.add([
+            Product.Create(),
+            Product.UpdateCreatedAt()
+        ])
     }
 }

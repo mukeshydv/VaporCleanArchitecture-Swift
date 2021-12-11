@@ -14,8 +14,8 @@ public struct CreateProductUseCase: AnyUseCase {
         self.repository = repository
     }
     
-    public func execute(request: Product) throws -> Future<Void> {
-        guard request.price > 0 else { throw DomainError.validationError("Price must not be negative") }
+    public func execute(request: RequestBody<Product>) throws -> Future<Void> {
+        guard request.value.price > 0 else { throw DomainError.validationError("Price must not be negative") }
         
         return repository.save(product: request)
     }

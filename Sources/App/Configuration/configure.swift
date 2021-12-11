@@ -1,23 +1,13 @@
 import Vapor
 import Data
+import Fluent
 
-/// Called before your application initializes.
-public func configure(_ config: inout Config, _ env: inout Environment, _ services: inout Services) throws {
-
-    /// Register routes to the router
-    services.register(Router.self) { (container) -> EngineRouter in
-        let router = EngineRouter.default()
-        try routes(router, container)
-        return router
-    }
-
+/// Application configuration
+public func configure(_ app: Application) throws {
     /// Register middleware
-    var middlewares = MiddlewareConfig() // Create _empty_ middleware config
-    middlewares.addMiddlewares()
+    app.middleware.addMiddlewares()
     
-    services.register(middlewares)
-    
-    services.registerProviders()
-    
-    try configure(&services)
+    try configure(app.databases, app.migrations)
+    try app.autoMigrate().wait()
+    try routes(app)
 }

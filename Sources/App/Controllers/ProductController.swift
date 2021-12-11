@@ -10,27 +10,36 @@ import Vapor
 import Domain
 
 final class ProductController: RouteCollection {
-    func boot(router: Router) throws {
-        let group = router.grouped("product")
+    func boot(routes: RoutesBuilder) throws {
+        let group = routes.grouped("product")
         
-        group.get("/", Int.parameter, use: getProduct)
-        group.post(ProductRequest.self, at: "/", use: addProduct)
+        group.get(":productId", use: getProduct)
+        group.post(use: addProduct)
     }
     
-    private let provider: ProductProvider
+    private let findProductUseCase: UseCase<Int, Product>
+    private let saveProductUseCase: UseCase<Product, Void>
     
-    init(_ provider: ProductProvider) {
-        self.provider = provider
+    init(
+        findProductUseCase: UseCase<Int, Product>,
+        saveProductUseCase: UseCase<Product, Void>
+    ) {
+        self.findProductUseCase = findProductUseCase
+        self.saveProductUseCase = saveProductUseCase
     }
 }
 
-extension ProductController {
-    private func getProduct(_ request: Request) throws -> Future<BaseResponse<ProductRequest>> {
-        let id = try request.parameters.next(Int.self)
-        return try provider.findProductUseCase.executeResponse(id)
+private extension ProductController {
+    func getProduct(_ request: Request) throws -> Future<BaseResponse<ProductRequest>> {
+        guard let id: Int = request.parameters.get("productId", as: Int.self) else {
+            throw DomainError.validationError("productId not found")
+        }
+        return try findProductUseCase.executeResponse(from: request, body: id)
     }
     
-    private func addProduct(_ request: Request, _ product: ProductRequest) throws -> Future<BaseResponse<Empty>> {
-        return try provider.saveProductUseCase.executeResponse(product.toProduct)
+    func addProduct(_ request: Request) throws -> Future<BaseResponse<Empty>> {
+        try ProductRequest.validate(content: request)
+        let product = try request.content.decode(ProductRequest.self)
+        return try saveProductUseCase.executeResponse(from: request, body: product.toProduct)
     }
 }

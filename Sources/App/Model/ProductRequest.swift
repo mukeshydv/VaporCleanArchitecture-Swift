@@ -9,21 +9,26 @@ import Foundation
 import Vapor
 import Domain
 
-struct ProductRequest: Content {
+struct ProductRequest: Content, Validatable {
     public let code: Int?
     public let description: String
-    public let price: Float
+    public let price: Double
     public let createdAt: Date
+    
+    static func validations(_ validations: inout Validations) {
+        validations.add("description", as: String.self, is: !.empty)
+        validations.add("price", as: Double.self, is: .range(PartialRangeFrom(0)))
+    }
 }
 
 extension ProductRequest {
     var toProduct: Product {
-        return Product(code: code, description: description, price: Float80(price), createdAt: createdAt)
+        return Product(code: code, description: description, price: price, createdAt: createdAt)
     }
 }
 
 extension Product: ResponseConvertible {
     var toResponse: ProductRequest {
-        return ProductRequest(code: code, description: description, price: Float(price), createdAt: createdAt)
+        return ProductRequest(code: code, description: description, price: price, createdAt: createdAt)
     }
 }

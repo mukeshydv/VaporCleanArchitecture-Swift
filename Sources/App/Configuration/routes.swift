@@ -1,14 +1,18 @@
 import Vapor
 import Domain
+import Data
 
 /// Register your application's routes here.
-public func routes(_ router: Router, _ container: Container) throws {
+public func routes(_ app: Application) throws {
     // Basic "It works" example
-    router.get { req in
+    app.get { req in
         return "It works!"
     }
-
-    let provider = try container.make(ProductProvider.self)
     
-    try router.register(collection: ProductController(provider))
+    let provider = DBProvider(databases: app.databases, logger: app.logger)
+    let repo = ProductRepository.create(for: provider)
+    try app.register(collection: ProductController(
+        findProductUseCase: GetProductByIdUseCase.create(repo),
+        saveProductUseCase: CreateProductUseCase.create(repo)
+    ))
 }

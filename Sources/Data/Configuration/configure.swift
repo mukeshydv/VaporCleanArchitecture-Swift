@@ -6,56 +6,45 @@
 //
 
 import Foundation
-import Fluent
-import FluentPostgreSQL
+import FluentKit
+import FluentPostgresDriver
 
-public typealias DBModel = PostgreSQLModel
-
-public func configure(_ services: inout Services) throws {
-    /// Register providers first
-    try services.register(FluentPostgreSQLProvider())
-    
+public func configure(_ databases: Databases, _ migrations: Migrations) throws {
     // Configure a database
-    if let hostname = Environment.get("db_hostname"),
-        let username = Environment.get("db_username"),
-        let portString = Environment.get("db_port"),
-        let database = Environment.get("db_database"),
+    if let hostname = ProcessInfo.processInfo.environment["db_hostname"],
+        let username = ProcessInfo.processInfo.environment["db_username"],
+        let password = ProcessInfo.processInfo.environment["db_password"],
+        let portString = ProcessInfo.processInfo.environment["db_port"],
+        let database = ProcessInfo.processInfo.environment["db_database"],
         let port = Int(portString) {
         
-        let config = PostgreSQLDatabaseConfig(
+        let config = PostgresConfiguration(
             hostname: hostname,
             port: port,
             username: username,
+            password: password,
             database: database
         )
-        
-        let database = PostgreSQLDatabase(config: config)
-        
-        /// Register the configured PostgreSQL database to the database config.
-        var databases = DatabasesConfig()
-        databases.add(database: database, as: .psql)
-        databases.enableLogging(on: .psql)
-        
-        services.register(databases)
-        
-        /// Configure migrations
-        var migrations = MigrationConfig()
+        databases.use(.postgres(configuration: config), as: .psql)
         migrations.addMigrations()
-        
-        services.register(migrations)
     } else {
         fatalError("Cannot connect to db")
     }
+}
+
+public struct DBProvider {
+    private let databases: Databases
+    private let logger: Logger
     
-    services.registerRepositories()
-}
-
-extension Database {
-    public typealias ConnectionPool = DatabaseConnectionPool<ConfiguredDatabase<PostgreSQLDatabase>>
-}
-
-extension Container {
-    func connectionPool() throws -> DatabaseConnectionPool<ConfiguredDatabase<PostgreSQLDatabase>> {
-        return try connectionPool(to: .psql)
+    public init(databases: Databases, logger: Logger) {
+        self.databases = databases
+        self.logger = logger
+    }
+    
+    public func getDatabase(eventLoop: EventLoop) -> Database {
+        return databases.database(
+            logger: logger,
+            on: eventLoop
+        )!
     }
 }

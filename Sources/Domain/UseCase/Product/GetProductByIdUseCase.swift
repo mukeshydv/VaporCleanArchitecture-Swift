@@ -15,7 +15,7 @@ public struct GetProductByIdUseCase: AnyUseCase {
         self.repository = repository
     }
     
-    public func execute(request: Int) -> Future<Product> {
+    public func execute(request: RequestBody<Int>) -> Future<Product> {
         return repository.getProductById(request)
     }
 }

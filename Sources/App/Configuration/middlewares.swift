@@ -8,9 +8,8 @@
 import Foundation
 import Vapor
 
-extension MiddlewareConfig {
+extension Middlewares {
     mutating func addMiddlewares() {
-        use(FileMiddleware.self) // Serves files from `Public/` directory
         use(ErrorMiddleware()) // Catches errors and converts to HTTP response
     }
 }

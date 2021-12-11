@@ -19,19 +19,19 @@ struct BaseResponse<T: Content>: Content {
 }
 
 extension DomainError {
-    var statusCode: Int {
-        switch self {
-        case .notFoundError:
-            return 404
-        case .validationError:
-            return 400
-        case .somethingWrong:
-            return 500
-        }
+    var toResponse: BaseResponse<Empty> {
+        return BaseResponse(status: Int(status.code), message: localizedDescription, data: nil)
     }
     
-    var toResponse: BaseResponse<Empty> {
-        return BaseResponse(status: statusCode, message: localizedDescription, data: nil)
+    var status: HTTPStatus {
+        switch self {
+        case .notFoundError:
+            return .notFound
+        case .validationError:
+            return .badRequest
+        case .somethingWrong:
+            return .internalServerError
+        }
     }
 }
 

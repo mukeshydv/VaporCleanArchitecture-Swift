@@ -13,8 +13,8 @@ protocol DomainConvertible {
     var toDomain: DomainType { get }
 }
 
-extension Future where T: DomainConvertible {
-    func mapToDomain<D>() -> Future<D> where D == T.DomainType {
+extension Future where Value: DomainConvertible {
+    func mapToDomain<D>() -> Future<D> where D == Value.DomainType {
         return map {
             $0.toDomain
         }

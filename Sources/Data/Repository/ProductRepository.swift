@@ -7,35 +7,32 @@
 
 import Foundation
 import Domain
-import Fluent
+import FluentKit
 
 public struct ProductRepository: Domain.ProductRepository {
     
-    private let db: Database.ConnectionPool
-    
-    public init(_ db: Database.ConnectionPool) {
+    private let db: DBProvider
+    public init(_ db: DBProvider) {
         self.db = db
     }
     
-    public func getProductById(_ id: Int) -> Future<Domain.Product> {
-        return db.withConnection {
-            return Product.find(id, on: $0)
-                .unwrap(or: DomainError.notFoundError("Product with id: \(id) is not found."))
+    public func getProductById(_ id: RequestBody<Int>) -> Future<Domain.Product> {
+        return db.getDatabase(eventLoop: id.eventLoop).withConnection {
+            return Product.find(id.value, on: $0)
+                .unwrap(orError: DomainError.notFoundError("Product with id: \(id) is not found."))
                 .mapToDomain()
         }
     }
     
-    public func save(product: Domain.Product) -> Future<Void> {
-        return db.withConnection {
-            return product.toData.save(on: $0).mapToVoid()
+    public func save(product: RequestBody<Domain.Product>) -> Future<Void> {
+        return db.getDatabase(eventLoop: product.eventLoop).withConnection {
+            return product.value.toData.save(on: $0).mapToVoid()
         }
     }
 }
 
-extension ProductRepository: ServiceType {
-    public static var serviceSupports: [Any.Type] = [Domain.ProductRepository.self]
-    
-    public static func makeService(for worker: Container) throws -> ProductRepository {
-        return .init(try worker.connectionPool())
+extension Domain.ProductRepository {
+    public static func create(for db: DBProvider) -> Domain.ProductRepository {
+        return ProductRepository(db)
     }
 }
