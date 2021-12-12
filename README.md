@@ -18,6 +18,6 @@ An example of Clean Architecture for Vapor swift server.
         <img src="https://circleci.com/gh/vapor/api-template.svg?style=shield" alt="Continuous Integration">
     </a>
     <a href="https://swift.org">
-        <img src="http://img.shields.io/badge/swift-4.1-brightgreen.svg" alt="Swift 5.1">
+        <img src="http://img.shields.io/badge/swift-5.1-brightgreen.svg" alt="Swift 5.1">
     </a>
 </p>
