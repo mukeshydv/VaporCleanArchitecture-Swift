@@ -1,10 +1,10 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.8
 import PackageDescription
 
 let package = Package(
     name: "VaporCleanArchitecture-Swift",
     platforms: [
-        .macOS(.v10_15)
+        .macOS(.v12)
     ],
     dependencies: [
         /// Event-driven network application framework for high performance protocol servers & clients, non-blocking.
@@ -22,7 +22,7 @@ let package = Package(
             .product(name: "Vapor", package: "vapor"),
             "Data"
         ]),
-        .target(name: "Run", dependencies: ["App"]),
+        .executableTarget(name: "Run", dependencies: ["App"]),
         .target(name: "Domain", dependencies: [
             .product(name: "NIO", package: "swift-nio")
         ]),

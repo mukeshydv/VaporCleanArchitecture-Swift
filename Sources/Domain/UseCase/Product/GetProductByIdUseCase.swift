@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import NIOCore
 
 public struct GetProductByIdUseCase: AnyUseCase {
     
